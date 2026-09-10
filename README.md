@@ -1,216 +1,316 @@
-# NOVA — Full-Stack AI Productivity Platform
+# NOVA — AI Productivity Platform
 
-**NOVA** is a complete, production-structured full-stack SaaS platform built with **React 18**, **Vite**, **Node.js**, **Express**, **Prisma ORM**, and **PostgreSQL**. It unifies project management, workflow automation, and team collaboration into an intelligent workspace.
+NOVA is an enterprise-grade, production-ready AI Productivity Platform built with **React + Vite**, **Node.js + Express**, **Prisma ORM**, **PostgreSQL**, **JWT Authentication**, and **bcrypt**.
 
-The application features a modern SaaS landing page, user registration, JWT authentication, user profile management, workspace organization, project CRUD, task Kanban board, AI Copilot assistant REST endpoint, and an authenticated Dashboard UI.
+It unifies workspace management, project tracking, interactive Kanban task boards, AI Copilot assistance, and team collaboration into a modern SaaS interface.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🎨 Architecture & Flow
 
 ```text
-               ┌──────────────────────────────────────────────┐
-               │              React + Vite Client             │
-               │   (Landing Page + Auth Modals + Dashboard)   │
-               └──────────────────────┬───────────────────────┘
-                                      │ REST API (Bearer JWT)
-                                      ▼
-               ┌──────────────────────────────────────────────┐
-               │           Node.js + Express Server           │
-               │     (Zod Validation, Auth, Error Handler)    │
-               └──────────────────────┬───────────────────────┘
-                                      │ Prisma ORM
-                                      ▼
-               ┌──────────────────────────────────────────────┐
-               │              PostgreSQL Database             │
-               │  (Users, Workspaces, Projects, Tasks, etc.)  │
-               └──────────────────────────────────────────────┘
+                    NOVA APPLICATION
+
+              ┌─────────────────────┐
+              │   React + Vite      │
+              │      Frontend       │
+              │       Vercel        │
+              └──────────┬──────────┘
+                         │
+                         │ HTTPS REST API
+                         ▼
+              ┌─────────────────────┐
+              │   Node.js + Express │
+              │       Backend       │
+              │       Render        │
+              └──────────┬──────────┘
+                         │
+                         │ Prisma ORM
+                         ▼
+              ┌─────────────────────┐
+              │     PostgreSQL      │
+              │   Render/Supabase   │
+              └─────────────────────┘
+```
+
+### Authentication Flow
+```text
+React Client
+    │
+    ├─► POST /api/auth/register or /api/auth/login
+    │
+Express Server
+    │
+    ├─► Input Validation (Zod)
+    ├─► Password Verification (bcryptjs)
+    ├─► Prisma ORM -> PostgreSQL Query
+    ├─► Generate Signed JWT Token
+    │
+React Client
+    │
+    └─► Store JWT Token -> Access Authenticated Workspace & Dashboard
+```
+
+### Deployment Flow Diagram
+```text
+GitHub Repo
+   │
+   ├──────────────► Vercel (Frontend)
+   │                 │
+   │                 │ React + Vite App
+   │                 ▼
+   │          VITE_API_URL
+   │                 │
+   └──────────────► Render (Backend)
+                     │
+                     │ Node.js + Express API
+                     ▼
+                 PostgreSQL (Render/Supabase)
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 Features
 
-### Frontend (`/frontend`)
-- **React 18** — Component UI framework
-- **Vite 5** — Build tool & dev server
-- **Vanilla CSS** — Custom properties, design tokens, glassmorphism, responsive grid
-- **Lucide React** — Icon library
-- **AuthContext** & **Centralized API Service** — State & HTTP communication
-
-### Backend (`/backend`)
-- **Node.js & Express.js** — REST API Web Server
-- **Prisma ORM** — Relational database management & migrations
-- **PostgreSQL** — Relational database
-- **JWT (`jsonwebtoken`)** — Stateless authentication
-- **bcryptjs** — Password hashing
-- **Zod** — Strict request payload validation
-- **Helmet & CORS** — Web security headers and cross-origin controls
+- **Preserved Premium UI & Landing Page**: Micro-animations, dark-mode glassmorphism styling, responsive hero, feature showcase, pricing tables, testimonials, interactive FAQ, and responsive mobile navigation.
+- **Full Authentication System**: User registration, login, JWT token management, bcrypt password hashing, and session auto-restoration (`GET /api/auth/me`).
+- **SaaS Workspace Architecture**: User creation automatically provisions default workspace and OWNER role membership.
+- **Relational Data Management**:
+  - **Projects**: Real CRUD operations persisted in PostgreSQL database with status (`PLANNING`, `IN_PROGRESS`, `COMPLETED`, `ON_HOLD`) and priority.
+  - **Tasks**: Dynamic Kanban board (`TODO`, `IN_PROGRESS`, `DONE`) connected to database backends.
+  - **User Profiles**: View and update user profile data (`name`, `company`, `jobTitle`, `avatar`).
+- **Public Contact & Newsletter**: Leads and newsletter subscriptions saved cleanly into database models with duplicate email detection.
+- **Backend AI Copilot Proxy**: Secure AI integration keeping API keys hidden from client browser scripts.
+- **Stripe Integration Architecture**: Ready-to-connect endpoints (`/api/billing/create-checkout-session`, `/api/billing/create-portal-session`, `/api/billing/webhook`).
+- **Production-Ready Security**: Helmet security headers, CORS origin restriction, Zod input validation, express-rate-limit protection, and central error handling.
 
 ---
 
-## 📁 Directory Structure
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18, Vite 5, Vanilla CSS Design System, Lucide Icons, Context API (`AuthContext`).
+- **Backend**: Node.js, Express.js, JWT (`jsonwebtoken`), bcryptjs, Zod, Helmet, Cors, express-rate-limit.
+- **ORM & Database**: Prisma ORM with PostgreSQL.
+- **Deployment Targets**: Frontend on **Vercel**, Backend on **Render**, Database on **Render PostgreSQL** or **Supabase**.
+
+---
+
+## 📁 Project Structure
 
 ```text
 nova/
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/       # Landing page sections, modals, ProtectedRoute
+│   │   ├── components/       # UI sections, Navbar, Footer, Modals, ProtectedRoute
 │   │   ├── context/          # AuthContext & ThemeContext
-│   │   ├── data/             # Structured mock data & features
-│   │   ├── hooks/            # useScrollAnimation & useCounter
+│   │   ├── data/             # Features, pricing, FAQ static data
+│   │   ├── hooks/            # Scroll & animation custom hooks
 │   │   ├── pages/            # LandingPage, LoginPage, RegisterPage, DashboardPage
-│   │   ├── services/         # Centralized API HTTP client (api.js)
-│   │   ├── App.jsx           # Main router & AuthProvider
-│   │   ├── main.jsx          # Entry point
-│   │   └── index.css         # Design system & tokens
+│   │   ├── services/         # Centralized API service (api.js)
+│   │   ├── App.jsx           # App routing & provider setup
+│   │   ├── main.jsx          # React DOM entry
+│   │   └── index.css         # Custom CSS tokens & variables
+│   │
 │   ├── package.json
+│   ├── .env.example          # VITE_API_URL template
 │   └── vite.config.js
 │
 ├── backend/
 │   ├── prisma/
-│   │   ├── schema.prisma     # Relational PostgreSQL schema
-│   │   └── seed.js           # Database seed script
+│   │   ├── migrations/       # SQL migrations for PostgreSQL
+│   │   ├── schema.prisma     # Relational models & enums
+│   │   └── seed.js           # Demo user & workspace seed script
+│   │
 │   ├── src/
-│   │   ├── config/           # Database & Prisma client setup
-│   │   ├── controllers/      # Auth, Users, Workspaces, Projects, Tasks, Contact, AI, Health
+│   │   ├── config/           # Database & Prisma configuration
+│   │   ├── controllers/      # Auth, User, Workspace, Project, Task, Contact, AI, Billing, Health
 │   │   ├── middleware/       # AuthMiddleware (JWT verification) & ErrorHandler
-│   │   ├── routes/           # Express router endpoints
-│   │   ├── services/         # Stripe billing service architecture
-│   │   ├── validators/       # Zod schemas for payload validation
-│   │   ├── app.js            # Express application setup
-│   │   └── server.js         # Entry point (Port 5000)
-│   ├── .env.example          # Environment variables template
-│   └── package.json
+│   │   ├── routes/           # REST API routes
+│   │   ├── services/         # Stripe & AI proxy services
+│   │   ├── validators/       # Zod payload validation schemas
+│   │   ├── app.js            # Express app configuration & middleware
+│   │   └── server.js         # HTTP Server listener with dynamic PORT
+│   │
+│   ├── package.json
+│   ├── .env.example          # Backend environment variables template
+│   └── .gitignore
 │
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-## 🗄️ Database Schema
+## 🔑 Environment Variables
 
-Managed via Prisma in `backend/prisma/schema.prisma`:
+### Backend (`backend/.env`)
+```env
+PORT=5000
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/nova"
+JWT_SECRET="replace-with-a-long-random-secret"
+CLIENT_URL="http://localhost:5173"
+OPENAI_API_KEY=""
+STRIPE_SECRET_KEY=""
+NODE_ENV="development"
+```
 
-- **User**: `id`, `name`, `email` (unique), `passwordHash`, `avatar`, `company`, `jobTitle`, `createdAt`, `updatedAt`
-- **Workspace**: `id`, `name`, `ownerId`, `createdAt`, `updatedAt`
-- **WorkspaceMember**: `id`, `workspaceId`, `userId`, `role` (`OWNER`, `ADMIN`, `MEMBER`), `createdAt`
-- **Project**: `id`, `workspaceId`, `name`, `description`, `status` (`PLANNING`, `IN_PROGRESS`, `COMPLETED`, `ON_HOLD`), `priority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`), `dueDate`, `createdAt`, `updatedAt`
-- **Task**: `id`, `projectId`, `assignedToId`, `title`, `description`, `status` (`TODO`, `IN_PROGRESS`, `DONE`), `priority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`), `dueDate`, `createdAt`, `updatedAt`
-- **Subscription**: `id`, `userId`, `plan` (`FREE`, `PRO`, `BUSINESS`), `status`, `billingCycle` (`MONTHLY`, `YEARLY`), `startDate`, `endDate`, `createdAt`
-- **ContactMessage**: `id`, `name`, `email`, `company`, `message`, `createdAt`
-- **NewsletterSubscriber**: `id`, `email` (unique), `createdAt`
-
----
-
-## 📡 API Endpoint Reference
-
-### Authentication (`/api/auth`)
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `POST` | `/api/auth/register` | Register new user, create default workspace & JWT | ❌ |
-| `POST` | `/api/auth/login` | Authenticate user & return JWT token | ❌ |
-| `GET` | `/api/auth/me` | Fetch authenticated user & workspace info | ✅ |
-
-### User Profile (`/api/users`)
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `GET` | `/api/users/me` | Get current profile | ✅ |
-| `PUT` | `/api/users/me` | Update profile information | ✅ |
-
-### Workspaces (`/api/workspaces`)
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `GET` | `/api/workspaces` | Fetch user workspaces | ✅ |
-| `POST` | `/api/workspaces` | Create new workspace | ✅ |
-| `GET` | `/api/workspaces/:workspaceId/members` | Get workspace members | ✅ |
-
-### Projects (`/api/projects`)
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `GET` | `/api/projects` | Fetch workspace projects | ✅ |
-| `POST` | `/api/projects` | Create new project | ✅ |
-| `GET` | `/api/projects/:id` | Fetch project details | ✅ |
-| `PUT` | `/api/projects/:id` | Update project details | ✅ |
-| `DELETE` | `/api/projects/:id` | Delete project | ✅ |
-
-### Tasks (`/api/tasks` & `/api/projects/:projectId/tasks`)
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `GET` | `/api/tasks` | Fetch all workspace tasks | ✅ |
-| `GET` | `/api/projects/:projectId/tasks` | Fetch tasks for specific project | ✅ |
-| `POST` | `/api/projects/:projectId/tasks` | Create new task | ✅ |
-| `PUT` | `/api/tasks/:id` | Update task status/priority | ✅ |
-| `DELETE` | `/api/tasks/:id` | Delete task | ✅ |
-
-### Public Leads & Newsletter
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `POST` | `/api/contact` | Submit contact/sales lead form | ❌ |
-| `POST` | `/api/newsletter` | Subscribe email to newsletter | ❌ |
-
-### AI Assistant & Health Check
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `POST` | `/api/ai/chat` | AI Copilot response engine | ✅ |
-| `GET` | `/api/health` | API server health check | ❌ |
+### Frontend (`frontend/.env`)
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
 ---
 
-## 🚀 Local Installation & Setup
+## 🗄️ Database Setup & Migrations
 
-### 1. Backend Setup
+The database models are configured in `backend/prisma/schema.prisma`.
+
+### Initializing Database Locally
 ```bash
 cd backend
-npm install
 
-# Copy environment template
-cp .env.example .env
-
-# Generate Prisma Client & Run Migrations (when PostgreSQL is running)
+# Generate Prisma Client
 npx prisma generate
-npx prisma db push
-npx prisma db seed
 
-# Start Express REST API Server (Port 5000)
-npm run dev
+# Apply migrations to PostgreSQL
+npx prisma migrate dev --name init
+
+# Seed demo user & workspace data
+npm run db:seed
 ```
 
-### 2. Frontend Setup
-```bash
-cd frontend
-npm install
-
-# Start Vite Development Server (Port 3000)
-npm run dev
-```
-
----
-
-## 🔑 Demo Credentials
-
+### Demo Account Credentials
 - **Email**: `dhanu@example.com`
 - **Password**: `StrongPassword123`
 
 ---
 
-## 🛡️ Security Best Practices Implemented
+## 📡 API Documentation
 
-- Passwords are strictly hashed with **bcryptjs** (salt rounds: 10).
-- Requests authorized using **JSON Web Tokens (JWT)** passed in `Authorization: Bearer <token>` headers.
-- Input data validated on the server using **Zod**.
-- Sensitive environment variables (`JWT_SECRET`, `DATABASE_URL`, `OPENAI_API_KEY`) loaded via `dotenv`.
-- Production bundle protected against cross-origin scripting with **Helmet**.
+### Health Check
+- `GET /api/health`: Verify API server status.
+
+### Authentication
+- `POST /api/auth/register`: Register user, create default workspace & generate JWT token.
+- `POST /api/auth/login`: Authenticate email + password & return JWT token.
+- `GET /api/auth/me`: Get current authenticated user details.
+
+### Users
+- `GET /api/users/me`: Get current profile details.
+- `PUT /api/users/me`: Update profile (name, company, job title, avatar).
+
+### Workspaces
+- `GET /api/workspaces`: List user workspaces.
+- `POST /api/workspaces`: Create a new workspace.
+- `GET /api/workspaces/:id`: Fetch workspace by ID.
+
+### Projects
+- `GET /api/projects`: List workspace projects.
+- `POST /api/projects`: Create project.
+- `GET /api/projects/:id`: Get project details.
+- `PUT /api/projects/:id`: Update project.
+- `DELETE /api/projects/:id`: Delete project.
+
+### Tasks
+- `GET /api/tasks`: List workspace tasks.
+- `GET /api/projects/:projectId/tasks`: List project tasks.
+- `POST /api/projects/:projectId/tasks`: Create task.
+- `PUT /api/tasks/:id`: Update task status/priority.
+- `DELETE /api/tasks/:id`: Delete task.
+
+### Public Leads & Newsletter
+- `POST /api/contact`: Store sales/contact form submissions.
+- `POST /api/newsletter`: Subscribe user to newsletter list.
+
+### AI Assistant & Billing
+- `POST /api/ai/chat`: AI chat interface.
+- `POST /api/billing/create-checkout-session`: Stripe checkout session initialization.
+- `POST /api/billing/create-portal-session`: Stripe billing portal session.
+- `POST /api/billing/webhook`: Stripe webhook listener.
 
 ---
 
-## 🤖 AI Tools Disclosure
+## 🚀 Local Installation & Execution
 
-AI assistance was utilized during development for:
-- Database relational schema design & Prisma mapping
-- REST API controller & Express router scaffolding
-- Zod schema validation rules
-- Component structure refinement & documentation synthesis
+### Step 1: Start Backend Server
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+The backend API server will start on `http://localhost:5000/api`.
 
-*All code was reviewed, refactored, customized, and verified for production standards.*
+### Step 2: Start Frontend Development Server
+```bash
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
+```
+The React frontend will start on `http://localhost:5173`.
+
+---
+
+## 🌐 Deploy Backend to Render
+
+Follow these exact steps to deploy the Express backend to **Render**:
+
+1. Push your repository to **GitHub**.
+2. Log in to [Render Dashboard](https://dashboard.render.com/) and click **New +** -> **Web Service**.
+3. Connect your GitHub repository (`dhanushmatcha/Nova`).
+4. Configure Web Service settings:
+   - **Name**: `nova-backend`
+   - **Root Directory**: `backend`
+   - **Environment**: `Node`
+   - **Region**: Select closest region to users
+   - **Branch**: `main`
+   - **Build Command**: `npm install && npx prisma generate && npx prisma migrate deploy`
+   - **Start Command**: `npm start`
+5. Create PostgreSQL Database on Render (or Supabase) and copy the **Internal / External Database URL**.
+6. Add Environment Variables under **Environment** tab:
+   - `DATABASE_URL`: `postgresql://<user>:<password>@<host>:5432/<dbname>?sslmode=require`
+   - `JWT_SECRET`: Generate a long random secret key
+   - `CLIENT_URL`: `https://YOUR-FRONTEND.vercel.app`
+   - `NODE_ENV`: `production`
+7. Click **Create Web Service**.
+8. Verify deployment by visiting: `https://YOUR-RENDER-SERVICE.onrender.com/api/health`.
+
+---
+
+## 🌐 Deploy Frontend to Vercel
+
+Follow these exact steps to deploy the React frontend to **Vercel**:
+
+1. Log in to [Vercel Dashboard](https://vercel.com/) and click **Add New...** -> **Project**.
+2. Import your GitHub repository (`dhanushmatcha/Nova`).
+3. Configure project settings:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: Select `frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Add Environment Variable under **Environment Variables**:
+   - `VITE_API_URL`: `https://YOUR-RENDER-SERVICE.onrender.com/api`
+5. Click **Deploy**.
+6. Once deployed, copy your Vercel URL (e.g. `https://nova-ai.vercel.app`).
+7. Return to **Render Dashboard** and update the `CLIENT_URL` environment variable to match your new Vercel URL.
+
+---
+
+## 🔒 Production Security Checklist
+
+- [x] No raw passwords in database (hashed with bcryptjs, salt 10).
+- [x] Secrets (`JWT_SECRET`, `DATABASE_URL`, `OPENAI_API_KEY`) stored exclusively in server environment variables.
+- [x] `.env` files added to `.gitignore`.
+- [x] CORS configured with strict client origin checks.
+- [x] Express helmet security headers active.
+- [x] Auth rate limiting enabled (`express-rate-limit`).
+- [x] Zod payload schemas enforced on input parameters.
+- [x] Render dynamic `process.env.PORT` support implemented.
+
+---
+
+## 📄 License
+
+MIT License © 2026 NOVA AI Platform

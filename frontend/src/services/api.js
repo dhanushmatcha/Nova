@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('nova_token');
@@ -96,6 +96,14 @@ export const api = {
     return handleResponse(res);
   },
 
+  getProject: async (id) => {
+    const res = await fetch(`${API_BASE_URL}/projects/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+    return handleResponse(res);
+  },
+
   createProject: async (projectData) => {
     const res = await fetch(`${API_BASE_URL}/projects`, {
       method: 'POST',
@@ -180,6 +188,15 @@ export const api = {
 
   // AI Assistant Chat
   sendAiChat: async (messageData) => {
+    const res = await fetch(`${API_BASE_URL}/ai/chat`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(messageData)
+    });
+    return handleResponse(res);
+  },
+
+  sendAIMessage: async (messageData) => {
     const res = await fetch(`${API_BASE_URL}/ai/chat`, {
       method: 'POST',
       headers: getAuthHeaders(),
