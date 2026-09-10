@@ -24,8 +24,24 @@ const app = express();
 
 // Security & Cross-Origin Middleware
 app.use(helmet({ crossOriginResourcePolicy: false }));
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://nova-gamma-topaz.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+].filter(Boolean).map(url => url.replace(/\/$/, ''));
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(normalizedOrigin) || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS policy does not allow access from ${origin}`));
+  },
   credentials: true
 }));
 
