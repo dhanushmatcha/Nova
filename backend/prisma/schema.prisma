@@ -1,0 +1,144 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+model User {
+  id           String            @id @default(uuid())
+  name         String
+  email        String            @unique
+  passwordHash String
+  avatar       String?
+  company      String?
+  jobTitle     String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  
+  ownedWorkspaces   Workspace[]       @relation("WorkspaceOwner")
+  workspaceMembers  WorkspaceMember[]
+  assignedTasks     Task[]            @relation("AssignedTasks")
+  subscriptions     Subscription[]
+}
+
+model Workspace {
+  id        String            @id @default(uuid())
+  name      String
+  ownerId   String
+  owner     User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  
+  members   WorkspaceMember[]
+  projects  Project[]
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceRole @default(MEMBER)
+  createdAt   DateTime      @default(now())
+
+  @@unique([workspaceId, userId])
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  status      ProjectStatus @default(PLANNING)
+  priority    Priority      @default(MEDIUM)
+  dueDate     DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  tasks       Task[]
+}
+
+model Task {
+  id           String     @id @default(uuid())
+  projectId    String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedToId String?
+  assignedTo   User?      @relation("AssignedTasks", fields: [assignedToId], references: [id], onDelete: SetNull)
+  title        String
+  description  String?
+  status       TaskStatus @default(TODO)
+  priority     Priority   @default(MEDIUM)
+  dueDate      DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Subscription {
+  id           String       @id @default(uuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan         Plan         @default(FREE)
+  status       String       @default("active")
+  billingCycle BillingCycle @default(MONTHLY)
+  startDate    DateTime     @default(now())
+  endDate      DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  company   String?
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
