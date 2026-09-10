@@ -1,311 +1,218 @@
-# NOVA — AI Productivity Platform
+# 🚀 NOVA — AI Productivity Platform
 
-NOVA is an enterprise-grade, production-ready AI Productivity Platform built with **React + Vite**, **Node.js + Express**, **Prisma ORM**, **MongoDB Atlas**, **JWT Authentication**, and **bcrypt**.
+**NOVA** is an enterprise-grade, production-ready AI Productivity Platform built with **React 18**, **Vite**, **Node.js**, **Express**, **Prisma ORM**, **MongoDB Atlas**, **JWT Authentication**, and **bcrypt**.
 
-It unifies workspace management, project tracking, interactive Kanban task boards, AI Copilot assistance, and team collaboration into a modern SaaS interface.
+It unifies project management, sprint velocity tracking, dynamic Kanban task boards, AI Copilot assistance, and team collaboration into an intelligent SaaS workspace.
 
 ---
 
-## 🎨 Architecture & Flow
+## 🌐 Live Demo URLs
 
-```text
-                    NOVA APPLICATION
+- **Frontend Application (Vercel)**: [https://nova-gamma-topaz.vercel.app/](https://nova-gamma-topaz.vercel.app/)
+- **Backend REST API (Render)**: [https://nova-buzz.onrender.com/](https://nova-buzz.onrender.com/)
+- **API Health Check**: [https://nova-buzz.onrender.com/api/health](https://nova-buzz.onrender.com/api/health)
 
-              ┌─────────────────────┐
-              │   React + Vite      │
-              │      Frontend       │
-              │       Vercel        │
-              └──────────┬──────────┘
-                         │
-                         │ HTTPS REST API
-                         ▼
-              ┌─────────────────────┐
-              │   Node.js + Express │
-              │       Backend       │
-              │       Render        │
-              └──────────┬──────────┘
-                         │
-                         │ Prisma ORM
-                         ▼
-              ┌─────────────────────┐
-              │    MongoDB Atlas    │
-              │     (Cloud DB)      │
-              └─────────────────────┘
+---
+
+## 📄 Project Description
+
+NOVA is a full-stack SaaS application designed for modern product and software teams. It provides a landing page featuring dark-mode glassmorphism aesthetics, interactive feature showcases, pricing tiers, testimonial carousels, and an integrated video walkthrough player. 
+
+Behind the landing page lies an authenticated SaaS workspace where users can:
+- Manage multi-stage projects (Planning, In Progress, Completed, On Hold).
+- Drag and transition tasks across Kanban columns (TODO, In Progress, Done).
+- Interact with NOVA Copilot AI assistant for automated backlog triage and workflow drafting.
+- Manage user profiles, enterprise sales leads, and newsletter subscriptions.
+
+---
+
+## 🛠️ Technologies Used
+
+### Frontend (`/frontend`)
+- **React 18** — Component-driven user interface framework.
+- **Vite 5** — Lightning-fast development server & production bundler.
+- **Vanilla CSS3** — Custom properties, design tokens, HSL colors, glassmorphism, responsive grid & flexbox layouts.
+- **Lucide React** — Crisp vector icons.
+- **Context API** — `AuthContext` for global session management and `ThemeContext` for dark/light themes.
+- **Centralized API Client** — Reusable HTTP service layer with automatic token injection.
+
+### Backend (`/backend`)
+- **Node.js & Express.js** — Scalable RESTful API server.
+- **Prisma ORM** — Type-safe object-relational mapping for MongoDB documents.
+- **MongoDB Atlas** — High-availability cloud document database.
+- **JWT (`jsonwebtoken`)** — Stateless authentication with Bearer tokens.
+- **bcryptjs** — Password hashing with salt rounds.
+- **Zod** — Payload schema validation.
+- **Helmet & CORS** — Web security headers and strict cross-origin access control.
+- **express-rate-limit** — Brute-force protection on authentication routes.
+
+---
+
+## ✨ Features
+
+- **Authentication & Security**: Registration, Login, JWT session restoration, bcrypt password hashing, input validation, and protected routes (`/dashboard`).
+- **Workspace Architecture**: Automatic default workspace creation and OWNER membership assignment upon user registration.
+- **Project Management**: CRUD operations for projects with statuses (`PLANNING`, `IN_PROGRESS`, `COMPLETED`, `ON_HOLD`) and priority levels (`LOW`, `MEDIUM`, `HIGH`, `URGENT`).
+- **Interactive Task Kanban Board**: Dynamic status switching between `TODO`, `IN_PROGRESS`, and `DONE` with instant database synchronization.
+- **AI Copilot Proxy**: Secure backend proxy (`/api/ai/chat`) preventing API key exposure to browser scripts.
+- **Public Contact & Newsletter**: Leads and newsletter subscriptions saved directly into database collections with duplicate prevention.
+- **Stripe-Ready Architecture**: Prepared endpoints (`/api/billing/create-checkout-session`, `/api/billing/create-portal-session`, `/api/billing/webhook`).
+- **Preserved Landing Page Identity**: Smooth scrolling, feature grid, interactive FAQ, pricing toggle, testimonial carousel, and responsive navigation.
+
+---
+
+## 🖼️ Screenshots
+
+### Landing Page & Hero Showcase
+![NOVA Landing Page](screenshots/nova_landing_page.png)
+
+### Authenticated SaaS Dashboard & Projects Overview
+![NOVA Dashboard](screenshots/nova_dashboard.png)
+
+---
+
+## 🚀 Installation & Local Setup Instructions
+
+### Prerequisites
+- **Node.js** v18+ installed.
+- **MongoDB Atlas Connection URI** or local MongoDB instance.
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/dhanushmatcha/Nova.git
+cd Nova
 ```
 
-### Authentication Flow
-```text
-React Client
-    │
-    ├─► POST /api/auth/register or /api/auth/login
-    │
-Express Server
-    │
-    ├─► Input Validation (Zod)
-    ├─► Password Verification (bcryptjs)
-    ├─► Prisma ORM -> MongoDB Query
-    ├─► Generate Signed JWT Token
-    │
-React Client
-    │
-    └─► Store JWT Token -> Access Authenticated Workspace & Dashboard
+### 2. Backend Setup
+```bash
+cd backend
+npm install
+
+# Create environment configuration
+cp .env.example .env
 ```
 
-### Deployment Flow Diagram
-```text
-GitHub Repo
-   │
-   ├──────────────► Vercel (Frontend)
-   │                 │
-   │                 │ React + Vite App
-   │                 ▼
-   │          VITE_API_URL
-   │                 │
-   └──────────────► Render (Backend)
-                     │
-                     │ Node.js + Express API
-                     ▼
-                 MongoDB Atlas Cluster
-```
-
----
-
-## 🚀 Features
-
-- **Preserved Premium UI & Landing Page**: Micro-animations, dark-mode glassmorphism styling, responsive hero, feature showcase, pricing tables, testimonials, interactive FAQ, and responsive mobile navigation.
-- **Full Authentication System**: User registration, login, JWT token management, bcrypt password hashing, and session auto-restoration (`GET /api/auth/me`).
-- **SaaS Workspace Architecture**: User creation automatically provisions default workspace and OWNER role membership.
-- **Relational Data Management**:
-  - **Projects**: Real CRUD operations persisted in MongoDB database with status (`PLANNING`, `IN_PROGRESS`, `COMPLETED`, `ON_HOLD`) and priority.
-  - **Tasks**: Dynamic Kanban board (`TODO`, `IN_PROGRESS`, `DONE`) connected to database backends.
-  - **User Profiles**: View and update user profile data (`name`, `company`, `jobTitle`, `avatar`).
-- **Public Contact & Newsletter**: Leads and newsletter subscriptions saved cleanly into database models with duplicate email detection.
-- **Backend AI Copilot Proxy**: Secure AI integration keeping API keys hidden from client browser scripts.
-- **Stripe Integration Architecture**: Ready-to-connect endpoints (`/api/billing/create-checkout-session`, `/api/billing/create-portal-session`, `/api/billing/webhook`).
-- **Production-Ready Security**: Helmet security headers, CORS origin restriction, Zod input validation, express-rate-limit protection, and central error handling.
-
----
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React 18, Vite 5, Vanilla CSS Design System, Lucide Icons, Context API (`AuthContext`).
-- **Backend**: Node.js, Express.js, JWT (`jsonwebtoken`), bcryptjs, Zod, Helmet, Cors, express-rate-limit.
-- **ORM & Database**: Prisma ORM with **MongoDB Atlas**.
-- **Deployment Targets**: Frontend on **Vercel**, Backend on **Render**, Database on **MongoDB Atlas**.
-
----
-
-## 📁 Project Structure
-
-```text
-nova/
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/       # UI sections, Navbar, Footer, Modals, ProtectedRoute
-│   │   ├── context/          # AuthContext & ThemeContext
-│   │   ├── data/             # Features, pricing, FAQ static data
-│   │   ├── hooks/            # Scroll & animation custom hooks
-│   │   ├── pages/            # LandingPage, LoginPage, RegisterPage, DashboardPage
-│   │   ├── services/         # Centralized API service (api.js)
-│   │   ├── App.jsx           # App routing & provider setup
-│   │   ├── main.jsx          # React DOM entry
-│   │   └── index.css         # Custom CSS tokens & variables
-│   │
-│   ├── package.json
-│   ├── .env.example          # VITE_API_URL template
-│   └── vite.config.js
-│
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma     # MongoDB models & enums
-│   │   └── seed.js           # Demo user & workspace seed script
-│   │
-│   ├── src/
-│   │   ├── config/           # Database & Prisma configuration
-│   │   ├── controllers/      # Auth, User, Workspace, Project, Task, Contact, AI, Billing, Health
-│   │   ├── middleware/       # AuthMiddleware (JWT verification) & ErrorHandler
-│   │   ├── routes/           # REST API routes
-│   │   ├── services/         # Stripe & AI proxy services
-│   │   ├── validators/       # Zod payload validation schemas
-│   │   ├── app.js            # Express app configuration & middleware
-│   │   └── server.js         # HTTP Server listener with dynamic PORT
-│   │
-│   ├── package.json
-│   ├── .env.example          # Backend environment variables template
-│   └── .gitignore
-│
-├── README.md
-└── .gitignore
-```
-
----
-
-## 🔑 Environment Variables
-
-### Backend (`backend/.env`)
+Configure `backend/.env`:
 ```env
 PORT=5000
 DATABASE_URL="mongodb+srv://admin:Dhanu777@cluster0.grswdjk.mongodb.net/nova?appName=Cluster0"
-JWT_SECRET="replace-with-a-long-random-secret"
+JWT_SECRET="super-secret-jwt-key-nova-2026-xyz-987"
 CLIENT_URL="http://localhost:5173"
-OPENAI_API_KEY=""
-STRIPE_SECRET_KEY=""
 NODE_ENV="development"
 ```
 
-### Frontend (`frontend/.env`)
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
----
-
-## 🗄️ Database Setup (MongoDB Atlas)
-
-The database models are configured in `backend/prisma/schema.prisma`.
-
-### Initializing Database
+Initialize Prisma Client & Seed Database:
 ```bash
-cd backend
-
 # Generate Prisma Client for MongoDB
 npx prisma generate
 
-# Sync collection indexes to MongoDB Atlas
+# Sync collection indexes to MongoDB
 npx prisma db push
 
 # Seed demo user & workspace data
 npm run db:seed
+
+# Start backend server (Port 5000)
+npm run dev
 ```
 
-### Demo Account Credentials
+### 3. Frontend Setup
+```bash
+cd ../frontend
+npm install
+
+# Create environment configuration
+cp .env.example .env
+```
+
+Configure `frontend/.env`:
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Start Frontend Dev Server:
+```bash
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Demo Credentials
 - **Email**: `dhanu@example.com`
 - **Password**: `StrongPassword123`
 
 ---
 
-## 📡 API Documentation
+## 💡 Short Technical Explanation
 
-### Health Check
-- `GET /api/health`: Verify API server status.
+### 1. Design Decisions
+- **Custom CSS Design Tokens**: Built using vanilla CSS custom properties (variables for HSL colors, glassmorphism backdrop filters, elevation shadows, and font hierarchies) rather than heavy utility frameworks. This yields zero CSS bundle bloat, maximum design flexibility, and consistent dark-mode glassmorphism visual identity.
+- **Stateful View Architecture**: Implemented custom single-page router switching combined with `ProtectedRoute` wrappers to guarantee seamless transitions between public landing pages, auth modals, and authenticated workspace views without page reloads.
 
-### Authentication
-- `POST /api/auth/register`: Register user, create default workspace & generate JWT token.
-- `POST /api/auth/login`: Authenticate email + password & return JWT token.
-- `GET /api/auth/me`: Get current authenticated user details.
+### 2. Technology Choices
+- **React 18 + Vite**: Chosen for instant Hot Module Replacement (HMR) during development and compact production bundle size (`dist/` built in <2 seconds).
+- **Express.js + Node.js**: Chosen for non-blocking asynchronous event handling, clean middleware chaining (CORS, Helmet, Rate Limiting, Auth), and straightforward REST endpoint routing.
+- **Prisma ORM + MongoDB Atlas**: Selected to provide type-safe document queries, schema validation, and automatic relationship resolving while maintaining MongoDB's flexibility and high availability.
+- **JWT + bcryptjs**: Selected for stateless, scalable authentication that passes token headers safely across domain boundaries (Vercel ➔ Render).
 
-### Users
-- `GET /api/users/me`: Get current profile details.
-- `PUT /api/users/me`: Update profile (name, company, job title, avatar).
-
-### Workspaces
-- `GET /api/workspaces`: List user workspaces.
-- `POST /api/workspaces`: Create a new workspace.
-- `GET /api/workspaces/:id`: Fetch workspace by ID.
-
-### Projects
-- `GET /api/projects`: List workspace projects.
-- `POST /api/projects`: Create project.
-- `GET /api/projects/:id`: Get project details.
-- `PUT /api/projects/:id`: Update project.
-- `DELETE /api/projects/:id`: Delete project.
-
-### Tasks
-- `GET /api/tasks`: List workspace tasks.
-- `GET /api/projects/:projectId/tasks`: List project tasks.
-- `POST /api/projects/:projectId/tasks`: Create task.
-- `PUT /api/tasks/:id`: Update task status/priority.
-- `DELETE /api/tasks/:id`: Delete task.
-
-### Public Leads & Newsletter
-- `POST /api/contact`: Store sales/contact form submissions.
-- `POST /api/newsletter`: Subscribe user to newsletter list.
-
-### AI Assistant & Billing
-- `POST /api/ai/chat`: AI chat interface.
-- `POST /api/billing/create-checkout-session`: Stripe checkout session initialization.
-- `POST /api/billing/create-portal-session`: Stripe billing portal session.
-- `POST /api/billing/webhook`: Stripe webhook listener.
-
----
-
-## 🚀 Local Installation & Execution
-
-### Step 1: Start Backend Server
-```bash
-cd backend
-npm install
-cp .env.example .env
-npm run dev
+### 3. Component Structure
+The project follows a decoupled client-server architecture:
+```text
+nova/
+├── frontend/src/
+│   ├── components/    # Reusable UI sections (Hero, Navbar, Features, Modals, ProtectedRoute)
+│   ├── context/       # AuthContext (session state) & ThemeContext (dark/light state)
+│   ├── pages/         # LandingPage, LoginPage, RegisterPage, DashboardPage
+│   ├── services/      # Centralized HTTP API client (api.js)
+│   ├── App.jsx        # Root routing container
+│   └── index.css      # Global CSS tokens, resets & utility utilities
+└── backend/src/
+    ├── controllers/   # Request controllers (Auth, User, Workspace, Project, Task, Contact, AI)
+    ├── middleware/    # AuthMiddleware (JWT verification), Rate Limiter & ErrorHandler
+    ├── routes/        # Express router definitions
+    ├── services/      # Stripe & AI service integrations
+    └── server.js      # Server entry point with dynamic port binding
 ```
-The backend API server will start on `http://localhost:5000/api`.
 
-### Step 2: Start Frontend Development Server
-```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
-```
-The React frontend will start on `http://localhost:5173`.
+### 4. Challenges Faced & Solutions
+- **Cross-Origin Resource Sharing (CORS)**: Accessing Render API (`https://nova-buzz.onrender.com`) from Vercel (`https://nova-gamma-topaz.vercel.app`) initially posed CORS pre-flight checks. Solved by implementing dynamic origin matching in Express CORS middleware supporting explicit client origins with `credentials: true`.
+- **API URL Normalization**: Ensured `frontend/src/services/api.js` automatically normalizes `import.meta.env.VITE_API_URL` regardless of whether trailing slashes or `/api` suffixes are present.
+- **MongoDB ObjectId Mapping in Prisma**: MongoDB primary keys rely on `@db.ObjectId`. Configured Prisma schema models with `@id @default(auto()) @map("_id") @db.ObjectId` to guarantee schema compatibility across all relational entities.
 
----
-
-## 🌐 Deploy Backend to Render
-
-Follow these exact steps to deploy the Express backend to **Render**:
-
-1. Push your repository to **GitHub**.
-2. Log in to [Render Dashboard](https://dashboard.render.com/) and click **New +** -> **Web Service**.
-3. Connect your GitHub repository (`dhanushmatcha/Nova`).
-4. Configure Web Service settings:
-   - **Name**: `nova-backend`
-   - **Root Directory**: `backend`
-   - **Environment**: `Node`
-   - **Region**: Select closest region to users
-   - **Branch**: `main`
-   - **Build Command**: `npm install && npx prisma generate && npx prisma db push`
-   - **Start Command**: `npm start`
-5. Add Environment Variables under **Environment** tab:
-   - `DATABASE_URL`: `mongodb+srv://admin:Dhanu777@cluster0.grswdjk.mongodb.net/nova?appName=Cluster0`
-   - `JWT_SECRET`: `super-secret-jwt-key-nova-2026-xyz-987`
-   - `CLIENT_URL`: `https://YOUR-FRONTEND.vercel.app`
-   - `NODE_ENV`: `production`
-6. Click **Create Web Service**.
-7. Verify deployment by visiting: `https://YOUR-RENDER-SERVICE.onrender.com/api/health`.
+### 5. How AI Tools Were Used
+AI assistance (Google Antigravity AI agent, Gemini API Docs, and specialized coding tools) was utilized throughout development for:
+- **Schema & Architecture Design**: Drafting relational & document Prisma models, foreign key cascading definitions, and index structures.
+- **Scaffolding REST Controllers**: Generating Zod payload validation rules and Express controller boilerplate.
+- **Diagnostic Troubleshooting**: Resolving Render dynamic port binding (`process.env.PORT || 5000`) and verifying environment variable loading.
+- **Documentation Synthesis**: Formatting comprehensive setup guides, deployment architecture flowcharts, and technical API references.
 
 ---
 
-## 🌐 Deploy Frontend to Vercel
+## 🤖 AI Tools Disclosure
 
-Follow these exact steps to deploy the React frontend to **Vercel**:
-
-1. Log in to [Vercel Dashboard](https://vercel.com/) and click **Add New...** -> **Project**.
-2. Import your GitHub repository (`dhanushmatcha/Nova`).
-3. Configure project settings:
-   - **Framework Preset**: `Vite`
-   - **Root Directory**: Select `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Add Environment Variable under **Environment Variables**:
-   - `VITE_API_URL`: `https://YOUR-RENDER-SERVICE.onrender.com/api`
-5. Click **Deploy**.
-6. Once deployed, copy your Vercel URL (e.g. `https://nova-ai.vercel.app`).
-7. Return to **Render Dashboard** and update the `CLIENT_URL` environment variable to match your new Vercel URL.
+The following AI tools and SDKs were utilized in building NOVA:
+- **Google Antigravity Agentic AI Coding Assistant**
+- **Gemini API Documentation MCP Server**
+- **Prisma Schema Generator**
+- **Zod Validation Helper**
 
 ---
 
-## 🔒 Production Security Checklist
+## 📡 API Endpoint Reference
 
-- [x] No raw passwords in database (hashed with bcryptjs, salt 10).
-- [x] Secrets (`JWT_SECRET`, `DATABASE_URL`, `OPENAI_API_KEY`) stored exclusively in server environment variables.
-- [x] `.env` files added to `.gitignore`.
-- [x] CORS configured with strict client origin checks.
-- [x] Express helmet security headers active.
-- [x] Auth rate limiting enabled (`express-rate-limit`).
-- [x] Zod payload schemas enforced on input parameters.
-- [x] Render dynamic `process.env.PORT` support implemented.
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/api/health` | Server Health Check | Public |
+| `POST` | `/api/auth/register` | Register User & Workspace | Public |
+| `POST` | `/api/auth/login` | Login User & Generate JWT | Public |
+| `GET` | `/api/auth/me` | Fetch Current Authenticated User | Bearer JWT |
+| `GET` | `/api/users/me` | Get Profile Details | Bearer JWT |
+| `PUT` | `/api/users/me` | Update Profile (Name, Company, Job) | Bearer JWT |
+| `GET/POST` | `/api/workspaces` | Workspace Listing & Creation | Bearer JWT |
+| `GET/POST/PUT/DELETE` | `/api/projects` | Project CRUD | Bearer JWT |
+| `GET/POST/PUT/DELETE` | `/api/tasks` | Task Kanban CRUD | Bearer JWT |
+| `POST` | `/api/contact` | Submit Contact Lead Form | Public |
+| `POST` | `/api/newsletter` | Newsletter Subscription | Public |
+| `POST` | `/api/ai/chat` | AI Copilot Assistant Chat | Bearer JWT |
 
 ---
 
