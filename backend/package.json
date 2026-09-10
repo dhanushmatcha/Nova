@@ -8,10 +8,11 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "build": "prisma generate",
-    "db:migrate": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma db push",
     "db:seed": "node prisma/seed.js",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:dbpush": "prisma db push"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",

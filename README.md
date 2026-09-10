@@ -1,6 +1,6 @@
 # NOVA — AI Productivity Platform
 
-NOVA is an enterprise-grade, production-ready AI Productivity Platform built with **React + Vite**, **Node.js + Express**, **Prisma ORM**, **PostgreSQL**, **JWT Authentication**, and **bcrypt**.
+NOVA is an enterprise-grade, production-ready AI Productivity Platform built with **React + Vite**, **Node.js + Express**, **Prisma ORM**, **MongoDB Atlas**, **JWT Authentication**, and **bcrypt**.
 
 It unifies workspace management, project tracking, interactive Kanban task boards, AI Copilot assistance, and team collaboration into a modern SaaS interface.
 
@@ -28,8 +28,8 @@ It unifies workspace management, project tracking, interactive Kanban task board
                          │ Prisma ORM
                          ▼
               ┌─────────────────────┐
-              │     PostgreSQL      │
-              │   Render/Supabase   │
+              │    MongoDB Atlas    │
+              │     (Cloud DB)      │
               └─────────────────────┘
 ```
 
@@ -43,7 +43,7 @@ Express Server
     │
     ├─► Input Validation (Zod)
     ├─► Password Verification (bcryptjs)
-    ├─► Prisma ORM -> PostgreSQL Query
+    ├─► Prisma ORM -> MongoDB Query
     ├─► Generate Signed JWT Token
     │
 React Client
@@ -65,7 +65,7 @@ GitHub Repo
                      │
                      │ Node.js + Express API
                      ▼
-                 PostgreSQL (Render/Supabase)
+                 MongoDB Atlas Cluster
 ```
 
 ---
@@ -76,7 +76,7 @@ GitHub Repo
 - **Full Authentication System**: User registration, login, JWT token management, bcrypt password hashing, and session auto-restoration (`GET /api/auth/me`).
 - **SaaS Workspace Architecture**: User creation automatically provisions default workspace and OWNER role membership.
 - **Relational Data Management**:
-  - **Projects**: Real CRUD operations persisted in PostgreSQL database with status (`PLANNING`, `IN_PROGRESS`, `COMPLETED`, `ON_HOLD`) and priority.
+  - **Projects**: Real CRUD operations persisted in MongoDB database with status (`PLANNING`, `IN_PROGRESS`, `COMPLETED`, `ON_HOLD`) and priority.
   - **Tasks**: Dynamic Kanban board (`TODO`, `IN_PROGRESS`, `DONE`) connected to database backends.
   - **User Profiles**: View and update user profile data (`name`, `company`, `jobTitle`, `avatar`).
 - **Public Contact & Newsletter**: Leads and newsletter subscriptions saved cleanly into database models with duplicate email detection.
@@ -90,8 +90,8 @@ GitHub Repo
 
 - **Frontend**: React 18, Vite 5, Vanilla CSS Design System, Lucide Icons, Context API (`AuthContext`).
 - **Backend**: Node.js, Express.js, JWT (`jsonwebtoken`), bcryptjs, Zod, Helmet, Cors, express-rate-limit.
-- **ORM & Database**: Prisma ORM with PostgreSQL.
-- **Deployment Targets**: Frontend on **Vercel**, Backend on **Render**, Database on **Render PostgreSQL** or **Supabase**.
+- **ORM & Database**: Prisma ORM with **MongoDB Atlas**.
+- **Deployment Targets**: Frontend on **Vercel**, Backend on **Render**, Database on **MongoDB Atlas**.
 
 ---
 
@@ -118,8 +118,7 @@ nova/
 │
 ├── backend/
 │   ├── prisma/
-│   │   ├── migrations/       # SQL migrations for PostgreSQL
-│   │   ├── schema.prisma     # Relational models & enums
+│   │   ├── schema.prisma     # MongoDB models & enums
 │   │   └── seed.js           # Demo user & workspace seed script
 │   │
 │   ├── src/
@@ -147,7 +146,7 @@ nova/
 ### Backend (`backend/.env`)
 ```env
 PORT=5000
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/nova"
+DATABASE_URL="mongodb+srv://admin:Dhanu777@cluster0.grswdjk.mongodb.net/nova?appName=Cluster0"
 JWT_SECRET="replace-with-a-long-random-secret"
 CLIENT_URL="http://localhost:5173"
 OPENAI_API_KEY=""
@@ -162,19 +161,19 @@ VITE_API_URL=http://localhost:5000/api
 
 ---
 
-## 🗄️ Database Setup & Migrations
+## 🗄️ Database Setup (MongoDB Atlas)
 
 The database models are configured in `backend/prisma/schema.prisma`.
 
-### Initializing Database Locally
+### Initializing Database
 ```bash
 cd backend
 
-# Generate Prisma Client
+# Generate Prisma Client for MongoDB
 npx prisma generate
 
-# Apply migrations to PostgreSQL
-npx prisma migrate dev --name init
+# Sync collection indexes to MongoDB Atlas
+npx prisma db push
 
 # Seed demo user & workspace data
 npm run db:seed
@@ -266,16 +265,15 @@ Follow these exact steps to deploy the Express backend to **Render**:
    - **Environment**: `Node`
    - **Region**: Select closest region to users
    - **Branch**: `main`
-   - **Build Command**: `npm install && npx prisma generate && npx prisma migrate deploy`
+   - **Build Command**: `npm install && npx prisma generate && npx prisma db push`
    - **Start Command**: `npm start`
-5. Create PostgreSQL Database on Render (or Supabase) and copy the **Internal / External Database URL**.
-6. Add Environment Variables under **Environment** tab:
-   - `DATABASE_URL`: `postgresql://<user>:<password>@<host>:5432/<dbname>?sslmode=require`
-   - `JWT_SECRET`: Generate a long random secret key
+5. Add Environment Variables under **Environment** tab:
+   - `DATABASE_URL`: `mongodb+srv://admin:Dhanu777@cluster0.grswdjk.mongodb.net/nova?appName=Cluster0`
+   - `JWT_SECRET`: `super-secret-jwt-key-nova-2026-xyz-987`
    - `CLIENT_URL`: `https://YOUR-FRONTEND.vercel.app`
    - `NODE_ENV`: `production`
-7. Click **Create Web Service**.
-8. Verify deployment by visiting: `https://YOUR-RENDER-SERVICE.onrender.com/api/health`.
+6. Click **Create Web Service**.
+7. Verify deployment by visiting: `https://YOUR-RENDER-SERVICE.onrender.com/api/health`.
 
 ---
 
